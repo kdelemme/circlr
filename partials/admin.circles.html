@@ -1,0 +1,36 @@
+<div class="row">
+	<div class="col-md-12">
+		
+		<form name="addForm" class="form-inline" role="form">
+			<div class="form-group">
+			    <input type="text" class="form-control input-sm" id="circle" placeholder="Circle Name" ng-model="circle.name">
+		  	</div>
+		  	<button type="submit" class="btn btn-success btn-sm" ng-click="addCircle(circle)">Create</button>
+		</form>
+
+
+		<h1>Your Circles</h1>
+
+		<table class="table table-condensed table-hover">
+			<thead>
+				<tr>
+					<th>Circle</th>
+					<th>Circle Key</th>
+					<th>View As</th>
+					<th>Circle Url</th>
+					<th>Delete</th>
+				</tr>
+			</thead>
+			<tbody ng-repeat='circle in circles'>
+				<tr>
+					<td>{{circle.name}}</td>
+					<td>{{circle.circleKey}}</td>
+					<td><button class="btn btn-info btn-xs" ui-sref="circlr.private({circleKey: circle.circleKey})">View As</button></td>
+					<td><button class="btn btn-success btn-xs" ng-click="copyCircleUrl(circle.circleKey)">Copy Circle Url</button></td>
+					<td><button class="btn btn-danger btn-xs" ng-click="deleteCircle(circle._id)">delete</button></td>
+				</tr>
+			</tbody>	
+		</table>
+
+	</div>
+</div>

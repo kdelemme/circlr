@@ -1,0 +1,11 @@
+{
+  "name": "circlr",
+  "description": "Circlr App - Share your photo with your circle",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "gulp-concat": "~2.3.4",
+    "gulp-less": "~1.3.3",
+    "gulp": "~3.8.6"
+  }
+}

@@ -1,0 +1,27 @@
+<div class="row">
+	<div class="col-md-12">
+		<h1>Your Photos</h1>
+
+		<div ng-show="photos.length == 0">
+			<p class="lead">You don't have any photos yet. <a class="btn btn-success" ui-sref="admin.upload">Upload Photos</a></p>
+		</div>
+
+		<ul class="list-unstyled" ng-repeat="photo in photos">
+			<li>
+				<circlr-admin-photo 
+					url="urlPhotoPrefix + photo.thumb_url" 
+					description="photo.description" 
+					circles="photo.circles" 
+					available-circles="circles"
+					on-update-description="updateDescription(photo._id, photo.description)" 
+					on-delete-photo="deletePhoto(photo._id)"
+					on-update-circles="updateCircles(photo._id, circles)">
+
+				</circlr-admin-photo>
+			</li>
+		</ul>
+
+	</div>
+</div>
+
+<circlr-load-more-photo on-load-more-photo="loadMorePhoto()" has-more-photo-to-load="hasMorePhotoToLoad"></circlr-load-more-photo>

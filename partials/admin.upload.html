@@ -1,0 +1,19 @@
+<div class="row">
+	<div class="col-md-12">
+		<h1>Upload Photo</h1>
+
+	  	<div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="optional-css-class-name-or-function" ng-show="dropSupported" class="dropbox">
+	        <span class="glyphicon glyphicon-picture dropbox-icon center-block"></span>
+	        <p class="text-center">Drop your images here</p>
+	    </div>
+	  	
+	  	<div ng-file-drop-available="dropSupported=true" ng-show="!dropSupported">
+	        HTML5 Drop File is not supported!
+	    </div>
+
+	    <circlr-admin-upload
+	    	uploads="uploads">
+	    </circlr-admin-upload>
+	</div>
+</div>
+

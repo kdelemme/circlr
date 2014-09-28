@@ -1,0 +1,11 @@
+<div class="row">
+	<div class="col-md-12 col-centered">
+		<ul class="list-unstyled" ng-repeat="photo in photos">
+			<li>
+				<circlr-photo url="urlPhotoPrefix + photo.img_url" description="photo.description"></circlr-photo>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<circlr-load-more-photo on-load-more-photo="loadMorePhoto()" has-more-photo-to-load="hasMorePhotoToLoad"></circlr-load-more-photo>

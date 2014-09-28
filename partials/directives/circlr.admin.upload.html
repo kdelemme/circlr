@@ -1,0 +1,17 @@
+<div class="row">
+	<div class="col-md-12">
+		<ul class="list-unstyled" ng-repeat="upload in uploads">
+			<li>
+				<div class="progress">
+					<div class="progress-bar" 
+					role="progressbar" 
+					aria-valuenow="{{upload.progress}}" aria-valuemin="0" aria-valuemax="100" 
+					style="width: {{upload.progress}}%;" 
+					ng-class="upload.progress == 100 ? (upload.error ? 'progress-bar-danger' : 'progress-bar-success') : 'progress-bar-info'">
+				    	{{upload.name}} ({{upload.progress}}%)
+					</div>
+				</div>
+			</li>
+	 	</ul>
+	</div>
+</div>

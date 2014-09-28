@@ -1,0 +1,35 @@
+<div class="row">
+	<div class="col-md-4">
+		<img src="{{url}}" class="img-responsive">
+	</div>
+	<div class="col-md-8">
+
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+			    <label class="col-sm-2 control-label" for="inputDescription">Description</label>
+			    <div class="col-sm-8">
+			    	<input type="text" class="col-sm-10 form-control" id="inputDescription" placeholder="Describe your amazing picture" ng-model="description">
+			    </div>
+			    <div class="col-sm-2">
+			    	<button class="btn btn-success" ng-click="updateDescription()">Update</button>
+			    </div>
+		  	</div>
+		</form>	
+
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+			    <label class="col-sm-2 control-label">Circles</label>
+			    <div class="col-sm-8">
+			    	<ul class="list-unstyled" ng-repeat="circle in availableCircles">
+						<li>
+							<input type="checkbox" ng-click="updateCircleList(circle)" ng-checked="isAlreadyInCircles(circle)"> {{circle.name}}
+						</li>
+					</ul>
+			    </div>
+		  	</div>
+		</form>			
+		
+		<p><button class="btn btn-danger" ng-click="deletePhoto()">Delete Photo</button></p>
+	</div>
+</div>
+
