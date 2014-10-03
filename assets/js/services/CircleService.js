@@ -11,6 +11,7 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 					_.each(data, function(circle) {
 						_circles.push(circle);
 					})
+
 				}).error(function(data, status) {
 					console.log(data);
 				});
@@ -38,11 +39,14 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 
 			deleteCircle: function(id) {
 				$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-					_circles = _.filter(_circles, function(c) {
-						return c._id != id;
+					_.each(_circles, function(c, index) {
+						if (c._id == id) {
+							_circles.splice(index, 1);
+							return true;
+						}
 					});
 
-					return true;
+					return false;
 				}).error(function(data, status) {
 					console.log(data);
 					return false;
