@@ -8,15 +8,11 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 	function AdminPhotosCtrl($scope, $http, _, CircleService, PhotoService, Options) {
 
 		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
-		$scope.circles = [];
+		$scope.circles = CircleService.getCircles();
 		$scope.photos = [];
 
 		$scope.offset = 0;
 		$scope.hasMorePhotoToLoad = true;
-
-		CircleService.getCircles().then(function(data) {
-			$scope.circles = data;
-		});
 
 		PhotoService.getAllPhotos($scope.offset).then(function(data) {
 			$scope.photos = data;

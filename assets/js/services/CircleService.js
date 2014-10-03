@@ -1,63 +1,68 @@
-appServices.factory('CircleService', function($http, $q, Options) {
-	return {
-		getCircles: function() {
-			var deferred = $q.defer();
+appServices.factory('CircleService', ['$http', '$q', '_', 'Options', 
+	function($http, $q,  _, Options) {
 
-			$http.get(Options.baseUrlApi + '/circles').success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+		var _circles = [];
 
-			return deferred.promise;
-		},
+		return {
+			getCircles: function() {
+				_circles = [];
 
-		getCircle: function(id) {
-			var deferred = $q.defer();
+				$http.get(Options.baseUrlApi + '/circles').success(function(data) {
+					_.each(data, function(circle) {
+						_circles.push(circle);
+					})
+				}).error(function(data, status) {
+					console.log(data);
+				});
 
-			$http.get(Options.baseUrlApi + '/circles/'+ id).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+				return _circles;
+			},
 
-			return deferred.promise;
-		},
+			getCircle: function(id) {
+				var circle = _.find(_circles, function(c) {
+					return c._id == id;
+				});
 
-		createCircle: function(circle) {
-			var deferred = $q.defer();
+				return circle || null;
+			},
 
-			$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+			createCircle: function(circle) {
+				$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+					_circles.push(data);
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			},
 
-			return deferred.promise;
-		},
+			deleteCircle: function(id) {
+				$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
+					_circles = _.filter(_circles, function(c) {
+						return c._id != id;
+					});
 
-		deleteCircle: function(id) {
-			var deferred = $q.defer();
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			},
 
-			$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+			editCircle: function(id, circle) {
+				$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
+					
+					var circleToUpdate = _.find(_circles, function(c) {
+						return c._id == id;
+					});
 
-			return deferred.promise;
-		},
-
-		editCircle: function(id, circle) {
-			var deferred = $q.defer();
-
-			$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
-
-			return deferred.promise;
-		}
-	};
-});
+					circleToUpdate = circle;
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			}
+		};
+	}
+]);

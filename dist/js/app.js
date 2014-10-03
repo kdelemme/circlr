@@ -60,59 +60,34 @@ appRoutes.config(function($stateProvider, $urlRouterProvider) {
  * Handles the deletion of existing circle
  * Handles the edition of existing circle
  */
-appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', '_', 'CircleService', 'Options',
-	function AdminCirclesCtrl($scope, $http, _, CircleService, Options) {
+appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService', 'Options',
+	function AdminCirclesCtrl($scope, $http, CircleService, Options) {
 
-		$scope.circles = [];
-
-		CircleService.getCircles().then(function(data) {
-			$scope.circles = data;
-		});
+		$scope.circles = CircleService.getCircles();
 
 		$scope.addCircle = function(circle) {
 			if (circle != null && circle.name != null) {
-				var alreadyDefined = _.find($scope.circles, function(c) {
-					return c.name == circle.name;
-				});
-
-				// circle.name doesn't exist yet, so let's create it
-				if (alreadyDefined == undefined) {
-					CircleService.createCircle(circle).then(function(data) {
-						//data contains {_id, circleKey and name}
-						$scope.circles.push(data);
-					});
+				var saved = CircleService.createCircle(circle);
+				if (saved) {
+					//do some stuff
 				}
 			}
 		}
 
 		$scope.deleteCircle = function(id) {
 			if (id != null) {
-				var exist = _.find($scope.circles, function(c) {
-					return c._id == id;
-				})
-
-				//circle id exists, so we can deletes it
-				if (exist != undefined) {
-					CircleService.deleteCircle(id).then(function(data) {
-						//remove the circle id from the list of circles
-						$scope.circles = _.filter($scope.circles, function(c) {
-							return c._id != id;
-						});
-					});
+				var deleted = CircleService.deleteCircle(id);
+				if (deleted) {
+					//do some stuff
 				}
 			}
 		}
 
 		$scope.editCircle = function(circle) {
 			if (circle != null && circle._id != null && circle.name != null) {
-				var exist = _.find($scope.circles, function(c) {
-					return c._id == circle._id;
-				});
-
-				if (exist != undefined) {
-					CircleService.editCircle(circle._id, circle).then(function(data) {
-						//TODO find method in underscorejs to modify array where predicates is true.
-					});
+				var saved = CircleService.editCircle(circle._id, circle);
+				if (saved) {
+					//do some stuff
 				}
 			}
 		}
@@ -147,15 +122,11 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 	function AdminPhotosCtrl($scope, $http, _, CircleService, PhotoService, Options) {
 
 		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
-		$scope.circles = [];
+		$scope.circles = CircleService.getCircles();
 		$scope.photos = [];
 
 		$scope.offset = 0;
 		$scope.hasMorePhotoToLoad = true;
-
-		CircleService.getCircles().then(function(data) {
-			$scope.circles = data;
-		});
 
 		PhotoService.getAllPhotos($scope.offset).then(function(data) {
 			$scope.photos = data;
@@ -407,69 +378,73 @@ appDirectives.directive('circlrPhoto', function() {
 	};
 });
 
-appServices.factory('CircleService', function($http, $q, Options) {
-	return {
-		getCircles: function() {
-			var deferred = $q.defer();
+appServices.factory('CircleService', ['$http', '$q', '_', 'Options', 
+	function($http, $q,  _, Options) {
 
-			$http.get(Options.baseUrlApi + '/circles').success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+		var _circles = [];
 
-			return deferred.promise;
-		},
+		return {
+			getCircles: function() {
+				_circles = [];
 
-		getCircle: function(id) {
-			var deferred = $q.defer();
+				$http.get(Options.baseUrlApi + '/circles').success(function(data) {
+					_.each(data, function(circle) {
+						_circles.push(circle);
+					})
+				}).error(function(data, status) {
+					console.log(data);
+				});
 
-			$http.get(Options.baseUrlApi + '/circles/'+ id).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+				return _circles;
+			},
 
-			return deferred.promise;
-		},
+			getCircle: function(id) {
+				var circle = _.find(_circles, function(c) {
+					return c._id == id;
+				});
 
-		createCircle: function(circle) {
-			var deferred = $q.defer();
+				return circle || null;
+			},
 
-			$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+			createCircle: function(circle) {
+				$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+					_circles.push(data);
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			},
 
-			return deferred.promise;
-		},
+			deleteCircle: function(id) {
+				$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
+					_circles = _.filter(_circles, function(c) {
+						return c._id != id;
+					});
 
-		deleteCircle: function(id) {
-			var deferred = $q.defer();
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			},
 
-			$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
+			editCircle: function(id, circle) {
+				$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
+					var circleToUpdate = _.find(_circles, function(c) {
+						return c._id == id;
+					});
 
-			return deferred.promise;
-		},
-
-		editCircle: function(id, circle) {
-			var deferred = $q.defer();
-
-			$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
-				deferred.resolve(data);
-			}).error(function(data, status) {
-				deferred.reject(data);
-			});
-
-			return deferred.promise;
-		}
-	};
-});
+					circleToUpdate = circle;
+					return true;
+				}).error(function(data, status) {
+					console.log(data);
+					return false;
+				});
+			}
+		};
+	}
+]);
 appServices.factory('PhotoService', function($http, $q, Options) {
 	return {
 		getPublicPhotos: function(offset) {
