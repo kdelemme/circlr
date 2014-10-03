@@ -12,8 +12,9 @@ appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService
 		$scope.addCircle = function(circle) {
 			if (circle != null && circle.name != null) {
 				var saved = CircleService.createCircle(circle);
+				
 				if (saved) {
-					//do some stuff
+					console.log('saved !');
 				}
 			}
 		}

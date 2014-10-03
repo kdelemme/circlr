@@ -27,7 +27,7 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 			},
 
 			createCircle: function(circle) {
-				$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+				return $http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
 					_circles.push(data);
 					return true;
 				}).error(function(data, status) {
@@ -51,7 +51,7 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 
 			editCircle: function(id, circle) {
 				$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
-					
+
 					var circleToUpdate = _.find(_circles, function(c) {
 						return c._id == id;
 					});
