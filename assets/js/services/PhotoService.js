@@ -1,6 +1,10 @@
 appServices.factory('PhotoService', function($http, $q, Options) {
 	return {
 		getPublicPhotos: function(offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/offsets/' + offset).success(function(data) {
@@ -12,7 +16,11 @@ appServices.factory('PhotoService', function($http, $q, Options) {
 			return deferred.promise;
 		},
 
-		getPrivatePhotosByCircleKey: function(offset, circleKey) {
+		getPrivatePhotosByCircleKey: function(circleKey, offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/' + circleKey + '/offsets/' + offset).success(function(data) {
@@ -25,6 +33,10 @@ appServices.factory('PhotoService', function($http, $q, Options) {
 		},
 
 		getAllPhotos: function(offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+			
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/all/offsets/' + offset).success(function(data) {

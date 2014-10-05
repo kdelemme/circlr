@@ -156,14 +156,11 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 		$scope.circles = [];
 		$scope.photos = [];
 
-		var _offset = 0;
-		$scope.hasMorePhotoToLoad = true;
-
 		CircleService.getCircles().then(function(data) {
 			$scope.circles = data;
 		});
 
-		PhotoService.getAllPhotos($scope.offset).then(function(data) {
+		PhotoService.getAllPhotos().then(function(data) {
 			$scope.photos = data;
 		});
 
@@ -198,17 +195,8 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 			});
 		}
 
-		$scope.loadMorePhoto = function() {
-			_offset++;
-
-			PhotoService.getAllPhotos(_offset).then(function(data) {
-				if (data && data.length > 0) {
-					$scope.photos = $scope.photos.concat(data);
-				}
-				else {
-					$scope.hasMorePhotoToLoad = false;
-				}
-			});
+		$scope.loadMorePhoto = function(offset) {
+			return PhotoService.getAllPhotos(offset);
 		}
 
 	}
@@ -277,28 +265,15 @@ appControllers.controller('CirclrPrivateCtrl', ['$scope', '$http', '$stateParams
 	function CirclrPrivateCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
 		var _circleKey = $stateParams.circleKey;
-		var _urlPhotoPrefix = Options.urlPhotoPrefix;
-		var _offset = 0;
-
-		$scope.hasMorePhotoToLoad = true;
-
+		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
 		$scope.photos = [];
 
-		PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
+		PhotoService.getPrivatePhotosByCircleKey(_circleKey).then(function(data) {
 			$scope.photos = data;
 		});
 
-		$scope.loadMorePhoto = function() {
-			_offset++;
-
-			PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
-				if (data && data.length > 0) {
-					$scope.photos = $scope.photos.concat(data);
-				}
-				else {
-					$scope.hasMorePhotoToLoad = false;
-				}
-			});
+		$scope.loadMorePhoto = function(offset) {
+			return PhotoService.getPrivatePhotosByCircleKey(_circleKey, offset);
 		}
 
 	}
@@ -314,27 +289,14 @@ appControllers.controller('CirclrPublicCtrl', ['$scope', '$http', '$stateParams'
 	function CirclrPublicCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
 		$scope.photos = [];
+		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
 
-		var _urlPhotoPrefix = Options.urlPhotoPrefix;
-		var _offset = 0;
-
-		$scope.hasMorePhotoToLoad = true;
-
-		PhotoService.getPublicPhotos($scope.offset).then(function(data) {
+		PhotoService.getPublicPhotos().then(function(data) {
 			$scope.photos = data;
 		});
 
-		$scope.loadMorePhoto = function() {
-			_offset++;
-
-			PhotoService.getPublicPhotos(_offset).then(function(data) {
-				if (data && data.length > 0) {
-					$scope.photos = $scope.photos.concat(data);
-				}
-				else {
-					$scope.hasMorePhotoToLoad = false;
-				}
-			});
+		$scope.loadMorePhoto = function(offset) {
+			return PhotoService.getPublicPhotos(offset);
 		}
 	}
 ]);
@@ -397,9 +359,27 @@ appDirectives.directive('circlrLoadMorePhoto', function() {
 		restrict: 'E',
 		scope: {
 			loadMorePhoto: '&onLoadMorePhoto',
-			hasMorePhotoToLoad: '='
+			photos: '='
 		},
-		templateUrl: 'partials/directives/circlr.load.more.photo.html'
+		templateUrl: 'partials/directives/circlr.load.more.photo.html',
+		controller: function($scope) {
+			var offset = 0;
+			$scope.hasMorePhotoToLoad = true;
+
+			$scope.loadMore = function() {
+				offset++;
+				
+				$scope.loadMorePhoto({offset: offset}).then(function(data) {
+					if (data && data.length > 0) {
+						$scope.photos = $scope.photos.concat(data);
+					}
+					else {
+						$scope.hasMorePhotoToLoad = false;
+					}
+				});
+			}
+			
+		}
 	};
 });
 appDirectives.directive('circlrPhoto', function() {
@@ -478,6 +458,10 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 appServices.factory('PhotoService', function($http, $q, Options) {
 	return {
 		getPublicPhotos: function(offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/offsets/' + offset).success(function(data) {
@@ -489,7 +473,11 @@ appServices.factory('PhotoService', function($http, $q, Options) {
 			return deferred.promise;
 		},
 
-		getPrivatePhotosByCircleKey: function(offset, circleKey) {
+		getPrivatePhotosByCircleKey: function(circleKey, offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/' + circleKey + '/offsets/' + offset).success(function(data) {
@@ -502,6 +490,10 @@ appServices.factory('PhotoService', function($http, $q, Options) {
 		},
 
 		getAllPhotos: function(offset) {
+			if (offset === undefined || offset === null) {
+				offset = 0;
+			}
+			
 			var deferred = $q.defer();
 
 			$http.get(Options.baseUrlApi + '/photos/all/offsets/' + offset).success(function(data) {

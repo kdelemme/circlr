@@ -11,14 +11,11 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 		$scope.circles = [];
 		$scope.photos = [];
 
-		var _offset = 0;
-		$scope.hasMorePhotoToLoad = true;
-
 		CircleService.getCircles().then(function(data) {
 			$scope.circles = data;
 		});
 
-		PhotoService.getAllPhotos($scope.offset).then(function(data) {
+		PhotoService.getAllPhotos().then(function(data) {
 			$scope.photos = data;
 		});
 
@@ -53,17 +50,8 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 			});
 		}
 
-		$scope.loadMorePhoto = function() {
-			_offset++;
-
-			PhotoService.getAllPhotos(_offset).then(function(data) {
-				if (data && data.length > 0) {
-					$scope.photos = $scope.photos.concat(data);
-				}
-				else {
-					$scope.hasMorePhotoToLoad = false;
-				}
-			});
+		$scope.loadMorePhoto = function(offset) {
+			return PhotoService.getAllPhotos(offset);
 		}
 
 	}
