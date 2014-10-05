@@ -4,28 +4,62 @@
  * Handles the deletion of existing circle
  * Handles the edition of existing circle
  */
-appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService', 'Options',
-	function AdminCirclesCtrl($scope, $http, CircleService, Options) {
+appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', '_', 'CircleService', 'Options',
+	function AdminCirclesCtrl($scope, $http, _, CircleService, Options) {
 
-		$scope.circles = CircleService.getCircles();
+		$scope.circles = [];
+
+		CircleService.getCircles().then(function(data) {
+			$scope.circles = data;
+		});
 
 		$scope.saveCircle = function(circle) {
 			if (circle != null && circle.name != null) {
-				var saved = CircleService.saveCircle(circle);
-				
-				if (saved) {
-					$scope.circleForm = {};
-					console.log('saved !');
-				}
+				CircleService.saveCircle(circle).then(
+					/* successCallback */
+					function(data) {
+
+						$scope.circleForm = {};
+
+						if (circle._id) {
+							// update existing circle
+							_.each($scope.circles, function(c, index, circles) {
+								if (c._id == circle._id) {
+									circles[index] = circle;
+									return ;
+								}
+							});
+						}
+						else {
+							//new circle
+							$scope.circles.push(data);
+						}
+					},
+
+					/* errorCallback */
+					function(data) {
+
+					}
+				);
 			}
 		}
 
 		$scope.deleteCircle = function(id) {
 			if (id != null) {
-				var deleted = CircleService.deleteCircle(id);
-				if (deleted) {
-					console.log('Deleted !');
-				}
+				CircleService.deleteCircle(id).then(
+					/* successCallback */
+					function(data) {
+
+						$scope.circles = _.filter($scope.circles, function(c) {
+							return c._id != id;
+						});
+					},
+
+					/* errorCallback */
+					function(data) {
+						
+					}
+				);
 			}
 		}
 

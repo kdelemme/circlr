@@ -1,32 +1,17 @@
-appServices.factory('CircleService', ['$http', '_', 'Options', 
-	function($http, _, Options) {
-
-		var _circles = [];
+appServices.factory('CircleService', ['$http', '$q', '_', 'Options', 
+	function($http, $q, _, Options) {
 
 		return {
 			getCircles: function() {
-				_circles = [];
+				var deferred = $q.defer();
 
 				$http.get(Options.baseUrlApi + '/circles').success(function(data) {
-					_.each(data, function(circle) {
-						_circles.push(circle);
-					})
-
+					deferred.resolve(data);
 				}).error(function(data, status) {
-					console.log(data);
+					deferred.reject(data);
 				});
 
-				console.log(_circles);
-
-				return _circles;
-			},
-
-			getCircle: function(id) {
-				var circle = _.find(_circles, function(c) {
-					return c._id == id;
-				});
-
-				return circle;
+				return deferred.promise;;
 			},
 
 			saveCircle: function(circle) {
@@ -34,36 +19,26 @@ appServices.factory('CircleService', ['$http', '_', 'Options',
 					return false;
 				} 
 
-				
+				var deferred = $q.defer();
+
 				if (circle._id) {
 					// Update
-
-					return $http.put(Options.baseUrlApi + '/circles/' + circle._id, circle).success(function(data) {
-						
-						_.each(_circles, function(c, index, _circles) {
-							if (c._id == circle._id) {
-								_circles[index] = circle;
-								return true;
-							}
-						});
-
-						return false;
+					$http.put(Options.baseUrlApi + '/circles/' + circle._id, circle).success(function(data) {
+						deferred.resolve(data);
 					}).error(function(data, status) {
-						console.log(data);
-						return false;
+						deferred.reject(data);
 					});
 
 				} else {
 					// Save new
-
-					return $http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
-						_circles.push(data);
-						return true;
+					$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+						deferred.resolve(data);
 					}).error(function(data, status) {
-						console.log(data);
-						return false;
+						deferred.reject(data);
 					});
 				}
+
+				return deferred.promise;
 			},
 
 			deleteCircle: function(id) {
@@ -71,19 +46,15 @@ appServices.factory('CircleService', ['$http', '_', 'Options',
 					return false;
 				}
 				
+				var deferred = $q.defer();
+				
 				return $http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-					_.each(_circles, function(c, index, _circles) {
-						if (c._id == id) {
-							_circles.splice(index, 1);
-							return true;
-						}
-					});
-
-					return false;
+					deferred.resolve(data);
 				}).error(function(data, status) {
-					console.log(data);
-					return false;
+					deferred.reject(data);
 				});
+
+				return deferred.promise;
 			}
 
 		};

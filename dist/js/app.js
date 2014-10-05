@@ -60,28 +60,62 @@ appRoutes.config(function($stateProvider, $urlRouterProvider) {
  * Handles the deletion of existing circle
  * Handles the edition of existing circle
  */
-appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService', 'Options',
-	function AdminCirclesCtrl($scope, $http, CircleService, Options) {
+appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', '_', 'CircleService', 'Options',
+	function AdminCirclesCtrl($scope, $http, _, CircleService, Options) {
 
-		$scope.circles = CircleService.getCircles();
+		$scope.circles = [];
+
+		CircleService.getCircles().then(function(data) {
+			$scope.circles = data;
+		});
 
 		$scope.saveCircle = function(circle) {
 			if (circle != null && circle.name != null) {
-				var saved = CircleService.saveCircle(circle);
-				
-				if (saved) {
-					$scope.circleForm = {};
-					console.log('saved !');
-				}
+				CircleService.saveCircle(circle).then(
+					/* successCallback */
+					function(data) {
+
+						$scope.circleForm = {};
+
+						if (circle._id) {
+							// update existing circle
+							_.each($scope.circles, function(c, index, circles) {
+								if (c._id == circle._id) {
+									circles[index] = circle;
+									return ;
+								}
+							});
+						}
+						else {
+							//new circle
+							$scope.circles.push(data);
+						}
+					},
+
+					/* errorCallback */
+					function(data) {
+
+					}
+				);
 			}
 		}
 
 		$scope.deleteCircle = function(id) {
 			if (id != null) {
-				var deleted = CircleService.deleteCircle(id);
-				if (deleted) {
-					console.log('Deleted !');
-				}
+				CircleService.deleteCircle(id).then(
+					/* successCallback */
+					function(data) {
+
+						$scope.circles = _.filter($scope.circles, function(c) {
+							return c._id != id;
+						});
+					},
+
+					/* errorCallback */
+					function(data) {
+						
+					}
+				);
 			}
 		}
 
@@ -375,35 +409,20 @@ appDirectives.directive('circlrPhoto', function() {
 	};
 });
 
-appServices.factory('CircleService', ['$http', '_', 'Options', 
-	function($http, _, Options) {
-
-		var _circles = [];
+appServices.factory('CircleService', ['$http', '$q', '_', 'Options', 
+	function($http, $q, _, Options) {
 
 		return {
 			getCircles: function() {
-				_circles = [];
+				var deferred = $q.defer();
 
 				$http.get(Options.baseUrlApi + '/circles').success(function(data) {
-					_.each(data, function(circle) {
-						_circles.push(circle);
-					})
-
+					deferred.resolve(data);
 				}).error(function(data, status) {
-					console.log(data);
+					deferred.reject(data);
 				});
 
-				console.log(_circles);
-
-				return _circles;
-			},
-
-			getCircle: function(id) {
-				var circle = _.find(_circles, function(c) {
-					return c._id == id;
-				});
-
-				return circle;
+				return deferred.promise;;
 			},
 
 			saveCircle: function(circle) {
@@ -411,36 +430,26 @@ appServices.factory('CircleService', ['$http', '_', 'Options',
 					return false;
 				} 
 
-				
+				var deferred = $q.defer();
+
 				if (circle._id) {
 					// Update
-
-					return $http.put(Options.baseUrlApi + '/circles/' + circle._id, circle).success(function(data) {
-						
-						_.each(_circles, function(c, index, _circles) {
-							if (c._id == circle._id) {
-								_circles[index] = circle;
-								return true;
-							}
-						});
-
-						return false;
+					$http.put(Options.baseUrlApi + '/circles/' + circle._id, circle).success(function(data) {
+						deferred.resolve(data);
 					}).error(function(data, status) {
-						console.log(data);
-						return false;
+						deferred.reject(data);
 					});
 
 				} else {
 					// Save new
-
-					return $http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
-						_circles.push(data);
-						return true;
+					$http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+						deferred.resolve(data);
 					}).error(function(data, status) {
-						console.log(data);
-						return false;
+						deferred.reject(data);
 					});
 				}
+
+				return deferred.promise;
 			},
 
 			deleteCircle: function(id) {
@@ -448,19 +457,15 @@ appServices.factory('CircleService', ['$http', '_', 'Options',
 					return false;
 				}
 				
+				var deferred = $q.defer();
+				
 				return $http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-					_.each(_circles, function(c, index, _circles) {
-						if (c._id == id) {
-							_circles.splice(index, 1);
-							return true;
-						}
-					});
-
-					return false;
+					deferred.resolve(data);
 				}).error(function(data, status) {
-					console.log(data);
-					return false;
+					deferred.reject(data);
 				});
+
+				return deferred.promise;
 			}
 
 		};
