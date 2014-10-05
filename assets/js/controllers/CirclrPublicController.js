@@ -6,9 +6,10 @@ appControllers.controller('CirclrPublicCtrl', ['$scope', '$http', '$stateParams'
 	function CirclrPublicCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
 		$scope.photos = [];
-		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
 
-		$scope.offset = 0;
+		var _urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _offset = 0;
+
 		$scope.hasMorePhotoToLoad = true;
 
 		PhotoService.getPublicPhotos($scope.offset).then(function(data) {
@@ -16,9 +17,9 @@ appControllers.controller('CirclrPublicCtrl', ['$scope', '$http', '$stateParams'
 		});
 
 		$scope.loadMorePhoto = function() {
-			$scope.offset++;
+			_offset++;
 
-			PhotoService.getPublicPhotos($scope.offset).then(function(data) {
+			PhotoService.getPublicPhotos(_offset).then(function(data) {
 				if (data && data.length > 0) {
 					$scope.photos = $scope.photos.concat(data);
 				}

@@ -5,23 +5,22 @@
 appControllers.controller('CirclrPrivateCtrl', ['$scope', '$http', '$stateParams', 'PhotoService', 'Options',
 	function CirclrPrivateCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
-		$scope.circleKey = $stateParams.circleKey;
-		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _circleKey = $stateParams.circleKey;
+		var _urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _offset = 0;
 
-		$scope.offset = 0;
 		$scope.hasMorePhotoToLoad = true;
 
 		$scope.photos = [];
 
-		PhotoService.getPrivatePhotosByCircleKey($scope.offset, $scope.circleKey).then(function(data) {
+		PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
 			$scope.photos = data;
 		});
 
-
 		$scope.loadMorePhoto = function() {
-			$scope.offset++;
+			_offset++;
 
-			PhotoService.getPrivatePhotosByCircleKey($scope.offset, $scope.circleKey).then(function(data) {
+			PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
 				if (data && data.length > 0) {
 					$scope.photos = $scope.photos.concat(data);
 				}

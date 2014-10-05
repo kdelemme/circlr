@@ -153,11 +153,15 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 	function AdminPhotosCtrl($scope, $http, _, CircleService, PhotoService, Options) {
 
 		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
-		$scope.circles = CircleService.getCircles();
+		$scope.circles = [];
 		$scope.photos = [];
 
-		$scope.offset = 0;
+		var _offset = 0;
 		$scope.hasMorePhotoToLoad = true;
+
+		CircleService.getCircles().then(function(data) {
+			$scope.circles = data;
+		});
 
 		PhotoService.getAllPhotos($scope.offset).then(function(data) {
 			$scope.photos = data;
@@ -195,9 +199,9 @@ appControllers.controller('AdminPhotosCtrl', ['$scope', '$http', '_', 'CircleSer
 		}
 
 		$scope.loadMorePhoto = function() {
-			$scope.offset++;
+			_offset++;
 
-			PhotoService.getAllPhotos($scope.offset).then(function(data) {
+			PhotoService.getAllPhotos(_offset).then(function(data) {
 				if (data && data.length > 0) {
 					$scope.photos = $scope.photos.concat(data);
 				}
@@ -272,23 +276,22 @@ appControllers.controller('CirclrCtrl', ['$scope', '$http',
 appControllers.controller('CirclrPrivateCtrl', ['$scope', '$http', '$stateParams', 'PhotoService', 'Options',
 	function CirclrPrivateCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
-		$scope.circleKey = $stateParams.circleKey;
-		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _circleKey = $stateParams.circleKey;
+		var _urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _offset = 0;
 
-		$scope.offset = 0;
 		$scope.hasMorePhotoToLoad = true;
 
 		$scope.photos = [];
 
-		PhotoService.getPrivatePhotosByCircleKey($scope.offset, $scope.circleKey).then(function(data) {
+		PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
 			$scope.photos = data;
 		});
 
-
 		$scope.loadMorePhoto = function() {
-			$scope.offset++;
+			_offset++;
 
-			PhotoService.getPrivatePhotosByCircleKey($scope.offset, $scope.circleKey).then(function(data) {
+			PhotoService.getPrivatePhotosByCircleKey(_offset, _circleKey).then(function(data) {
 				if (data && data.length > 0) {
 					$scope.photos = $scope.photos.concat(data);
 				}
@@ -311,9 +314,10 @@ appControllers.controller('CirclrPublicCtrl', ['$scope', '$http', '$stateParams'
 	function CirclrPublicCtrl($scope, $http, $stateParams, PhotoService, Options) {
 		
 		$scope.photos = [];
-		$scope.urlPhotoPrefix = Options.urlPhotoPrefix;
 
-		$scope.offset = 0;
+		var _urlPhotoPrefix = Options.urlPhotoPrefix;
+		var _offset = 0;
+
 		$scope.hasMorePhotoToLoad = true;
 
 		PhotoService.getPublicPhotos($scope.offset).then(function(data) {
@@ -321,9 +325,9 @@ appControllers.controller('CirclrPublicCtrl', ['$scope', '$http', '$stateParams'
 		});
 
 		$scope.loadMorePhoto = function() {
-			$scope.offset++;
+			_offset++;
 
-			PhotoService.getPublicPhotos($scope.offset).then(function(data) {
+			PhotoService.getPublicPhotos(_offset).then(function(data) {
 				if (data && data.length > 0) {
 					$scope.photos = $scope.photos.concat(data);
 				}
