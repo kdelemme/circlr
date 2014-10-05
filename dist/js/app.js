@@ -319,6 +319,8 @@ appDirectives.directive('circlrAdminPhoto', function() {
 		controller: function($scope) {
 
 			var circles = $scope.circles;
+			$scope.isDescUpdated = false;
+			$scope.initialDescription = $scope.description;
 			
 			$scope.updateCircleList = function(circle) {
 				var alreadyInCircles = $scope.isAlreadyInCircles(circle);
@@ -342,6 +344,23 @@ appDirectives.directive('circlrAdminPhoto', function() {
 
 				return alreadyInCircles;
 			}
+
+			$scope.updateDesc = function() {
+				$scope.updateDescription();
+				$scope.isDescUpdated = false;
+				$scope.initialDescription = $scope.description;
+			}
+		},
+
+		link: function(scope, element, attrs) {
+
+			element.find("#inputDescription").on('keyup', function() {
+				if (scope.initialDescription !== this.value) {
+					scope.isDescUpdated = true;
+				} else {
+					scope.isDescUpdated = false;
+				}
+			});
 		}
 	};
 });
@@ -365,6 +384,7 @@ appDirectives.directive('circlrLoadMorePhoto', function() {
 		controller: function($scope) {
 			var offset = 0;
 			$scope.hasMorePhotoToLoad = true;
+			$scope.btnTextLoadMore = "Load More Awesomeness";
 
 			$scope.loadMore = function() {
 				offset++;
@@ -375,6 +395,7 @@ appDirectives.directive('circlrLoadMorePhoto', function() {
 					}
 					else {
 						$scope.hasMorePhotoToLoad = false;
+						$scope.btnTextLoadMore = "No More Awesomeness"
 					}
 				});
 			}

@@ -8,10 +8,10 @@
 			<div class="form-group">
 			    <label class="col-sm-2 control-label" for="inputDescription">Description</label>
 			    <div class="col-sm-8">
-			    	<input type="text" class="col-sm-10 form-control" id="inputDescription" placeholder="Describe your amazing picture" ng-model="description">
+			    	<input type="text" class="col-sm-10 form-control input-sm" id="inputDescription" placeholder="Describe your amazing picture" ng-model="description">
 			    </div>
 			    <div class="col-sm-2">
-			    	<button class="btn btn-success" ng-click="updateDescription()">Update</button>
+			    	<button class="btn btn-success btn-sm" ng-click="updateDesc()" ng-disabled="!isDescUpdated">Update</button>
 			    </div>
 		  	</div>
 		</form>	
@@ -29,7 +29,13 @@
 		  	</div>
 		</form>			
 		
-		<p><button class="btn btn-danger" ng-click="deletePhoto()">Delete Photo</button></p>
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+				<div class="col-sm-offset-10 col-sm-2">
+					<button class="btn btn-danger btn-sm" ng-click="deletePhoto()">Delete Photo</button>
+				</div>
+			</div>
+		</form>
 	</div>
 </div>
 

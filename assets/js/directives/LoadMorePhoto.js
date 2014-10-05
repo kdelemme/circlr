@@ -9,6 +9,7 @@ appDirectives.directive('circlrLoadMorePhoto', function() {
 		controller: function($scope) {
 			var offset = 0;
 			$scope.hasMorePhotoToLoad = true;
+			$scope.btnTextLoadMore = "Load More Awesomeness";
 
 			$scope.loadMore = function() {
 				offset++;
@@ -19,6 +20,7 @@ appDirectives.directive('circlrLoadMorePhoto', function() {
 					}
 					else {
 						$scope.hasMorePhotoToLoad = false;
+						$scope.btnTextLoadMore = "No More Awesomeness"
 					}
 				});
 			}
