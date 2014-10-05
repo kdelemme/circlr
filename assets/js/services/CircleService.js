@@ -1,5 +1,5 @@
-appServices.factory('CircleService', ['$http', '$q', '_', 'Options', 
-	function($http, $q,  _, Options) {
+appServices.factory('CircleService', ['$http', '_', 'Options', 
+	function($http, _, Options) {
 
 		var _circles = [];
 
@@ -16,6 +16,8 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 					console.log(data);
 				});
 
+				console.log(_circles);
+
 				return _circles;
 			},
 
@@ -24,22 +26,53 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 					return c._id == id;
 				});
 
-				return circle || null;
+				return circle;
 			},
 
-			createCircle: function(circle) {
-				return $http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
-					_circles.push(data);
-					return true;
-				}).error(function(data, status) {
-					console.log(data);
+			saveCircle: function(circle) {
+				if (circle == null || circle.name == null || circle.name.trim().length == 0) {
 					return false;
-				});
+				} 
+
+				
+				if (circle._id) {
+					// Update
+
+					return $http.put(Options.baseUrlApi + '/circles/' + circle._id, circle).success(function(data) {
+						
+						_.each(_circles, function(c, index, _circles) {
+							if (c._id == circle._id) {
+								_circles[index] = circle;
+								return true;
+							}
+						});
+
+						return false;
+					}).error(function(data, status) {
+						console.log(data);
+						return false;
+					});
+
+				} else {
+					// Save new
+
+					return $http.post(Options.baseUrlApi + '/circles', circle).success(function(data) {
+						_circles.push(data);
+						return true;
+					}).error(function(data, status) {
+						console.log(data);
+						return false;
+					});
+				}
 			},
 
 			deleteCircle: function(id) {
-				$http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
-					_.each(_circles, function(c, index) {
+				if (id == null) {
+					return false;
+				}
+				
+				return $http.delete(Options.baseUrlApi + '/circles/' + id).success(function(data) {
+					_.each(_circles, function(c, index, _circles) {
 						if (c._id == id) {
 							_circles.splice(index, 1);
 							return true;
@@ -51,22 +84,8 @@ appServices.factory('CircleService', ['$http', '$q', '_', 'Options',
 					console.log(data);
 					return false;
 				});
-			},
-
-			editCircle: function(id, circle) {
-				$http.put(Options.baseUrlApi + '/circles/' + id, circle).success(function(data) {
-
-					var circleToUpdate = _.find(_circles, function(c) {
-						return c._id == id;
-					});
-
-					circleToUpdate = circle;
-					return true;
-				}).error(function(data, status) {
-					console.log(data);
-					return false;
-				});
 			}
+
 		};
 	}
 ]);

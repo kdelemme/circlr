@@ -3,9 +3,9 @@
 		
 		<form name="addForm" class="form-inline" role="form">
 			<div class="form-group">
-			    <input type="text" class="form-control input-sm" id="circle" placeholder="Circle Name" ng-model="circle.name">
+			    <input type="text" class="form-control input-sm" id="circle" placeholder="Circle Name" ng-model="circleForm.name">
 		  	</div>
-		  	<button type="submit" class="btn btn-success btn-sm" ng-click="addCircle(circle)">Create</button>
+		  	<button type="submit" class="btn btn-success btn-sm" ng-click="saveCircle(circleForm)">Save</button>
 		</form>
 
 		<h1>Your Circles</h1>
@@ -17,6 +17,7 @@
 					<th>Circle Key</th>
 					<th>View As</th>
 					<th>Circle Url</th>
+					<th>Edit</th>
 					<th>Delete</th>
 				</tr>
 			</thead>
@@ -26,7 +27,8 @@
 					<td>{{circle.circleKey}}</td>
 					<td><button class="btn btn-info btn-xs" ui-sref="circlr.private({circleKey: circle.circleKey})">View As</button></td>
 					<td><button class="btn btn-success btn-xs" ng-click="copyCircleUrl(circle.circleKey)">Copy Circle Url</button></td>
-					<td><button class="btn btn-danger btn-xs" ng-click="deleteCircle(circle._id)">delete</button></td>
+					<td><button class="btn btn-warning btn-xs" ng-click="editCircle(circle)">Edit</button></td>
+					<td><button class="btn btn-danger btn-xs" ng-click="deleteCircle(circle._id)">Delete</button></td>
 				</tr>
 			</tbody>	
 		</table>

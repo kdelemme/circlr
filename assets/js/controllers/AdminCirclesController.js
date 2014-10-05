@@ -9,11 +9,12 @@ appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService
 
 		$scope.circles = CircleService.getCircles();
 
-		$scope.addCircle = function(circle) {
+		$scope.saveCircle = function(circle) {
 			if (circle != null && circle.name != null) {
-				var saved = CircleService.createCircle(circle);
+				var saved = CircleService.saveCircle(circle);
 				
 				if (saved) {
+					$scope.circleForm = {};
 					console.log('saved !');
 				}
 			}
@@ -23,18 +24,13 @@ appControllers.controller('AdminCirclesCtrl', ['$scope', '$http', 'CircleService
 			if (id != null) {
 				var deleted = CircleService.deleteCircle(id);
 				if (deleted) {
-					//do some stuff
+					console.log('Deleted !');
 				}
 			}
 		}
 
 		$scope.editCircle = function(circle) {
-			if (circle != null && circle._id != null && circle.name != null) {
-				var saved = CircleService.editCircle(circle._id, circle);
-				if (saved) {
-					//do some stuff
-				}
-			}
+			$scope.circleForm = angular.copy(circle);
 		}
 
 		$scope.copyCircleUrl = function(circleKey) {
